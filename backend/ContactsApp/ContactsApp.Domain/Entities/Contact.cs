@@ -14,6 +14,8 @@ namespace ContactsApp.Domain.Entities
 
         public DateOnly DateOfBirth { get; private set; }
 
+        public string IBAN { get; set; }
+
         public Address? Address { get; set; }
 
         private readonly List<PhoneNumber> _phoneNumbers = new ();
@@ -23,18 +25,19 @@ namespace ContactsApp.Domain.Entities
         {
         }
 
-        public static Contact Create(string firstName, string surname, DateOnly dateOfBirth)
+        public static Contact Create(string firstName, string surname, DateOnly dateOfBirth, string iban)
         {
             var contact = new Contact();
-            contact.SetContact(firstName, surname, dateOfBirth);
+            contact.SetContact(firstName, surname, dateOfBirth, iban);
             return contact;
         }
 
-        public void SetContact(string firstName, string surname, DateOnly dateOfBirth)
+        public void SetContact(string firstName, string surname, DateOnly dateOfBirth, string iban)
         {
             FirstName = firstName;
             Surname = surname;
             DateOfBirth = dateOfBirth;
+            IBAN = iban;
         }
     }
 }
