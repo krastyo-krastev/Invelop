@@ -6,7 +6,7 @@ namespace ContactsApp.Application.Contacts.Models
 {
     public record ContactDTO(string FirstName,
         string Surname,
-        DateOnly DateOfBirth,
+        string DateOfBirth,
         string IBAN,
         IReadOnlyCollection<PhoneNumberDTO> PhoneNumbers,
         string Country,

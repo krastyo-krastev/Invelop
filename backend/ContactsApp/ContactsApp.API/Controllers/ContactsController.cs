@@ -21,7 +21,7 @@ namespace ContactsApp.API.Controllers
         {
             var command = new CreateContactCommand(contact.FirstName,
                 contact.Surname,
-                contact.DateOfBirth,
+                DateOnly.Parse(contact.DateOfBirth),
                 contact.IBAN,
                 contact.PhoneNumbers,
                 contact.Country,
