@@ -14,15 +14,16 @@ namespace ContactsApp.Domain.Entities
 
         public DateOnly DateOfBirth { get; private set; }
 
-        public string IBAN { get; set; }
+        public string IBAN { get; set; } = string.Empty;
 
-        public Address? Address { get; set; }
+        public Address Address { get; set; }
 
         private readonly List<PhoneNumber> _phoneNumbers = new ();
         public IReadOnlyCollection<PhoneNumber> PhoneNumbers { get => _phoneNumbers; }
 
         private Contact()
         {
+            Address = Address.Create(string.Empty, string.Empty, string.Empty, string.Empty);
         }
 
         public static Contact Create(string firstName, string surname, DateOnly dateOfBirth, string iban)

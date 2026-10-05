@@ -6,22 +6,28 @@ namespace ContactsApp.Domain.Entities
 {
     public class PhoneNumber
     {
-        public string Value { get; private set; } = string.Empty;
+        public string Number { get; private set; } = string.Empty;
+
+        public string Type { get; private set; } = string.Empty;
+
+        public bool IsPrimary { get; private set; }
 
         private PhoneNumber()
         {
         }
 
-        public static PhoneNumber Create(string value)
+        public static PhoneNumber Create(string number, string type, bool isPrimary)
         {
             var phoneNumber = new PhoneNumber();
-            phoneNumber.SetPhoneNumber(value);
+            phoneNumber.SetPhoneNumber(number, type, isPrimary);
             return phoneNumber;
         }
 
-        public void SetPhoneNumber(string value)
+        public void SetPhoneNumber(string number, string type, bool isPrimary)
         {
-            Value = value;
+            Number = number;
+            Type = type;
+            IsPrimary = isPrimary;
         }
     }
 }
