@@ -1,6 +1,7 @@
 
 using ContactsApp.Application.Abstractions;
 using ContactsApp.Application.Contacts.Commands.CreateContact;
+using ContactsApp.Infrastructure;
 
 namespace ContactsApp.API
 {
@@ -11,7 +12,8 @@ namespace ContactsApp.API
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-            builder.Services.AddScoped<ICommandHandler<CreateContactCommand>, CreateContactCommandHandler>();
+            builder.Services.AddApplicationServices();
+            builder.Services.AddInfrastructureServices();
 
             builder.Services.AddControllers();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
