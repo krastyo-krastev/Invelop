@@ -4,7 +4,7 @@ using System.Text;
 
 namespace ContactsApp.Domain.Entities
 {
-    public class PhoneNumber
+    public sealed class PhoneNumber
     {
         public string Number { get; private set; } = string.Empty;
 
@@ -19,11 +19,11 @@ namespace ContactsApp.Domain.Entities
         public static PhoneNumber Create(string number, string type, bool isPrimary)
         {
             var phoneNumber = new PhoneNumber();
-            phoneNumber.SetPhoneNumber(number, type, isPrimary);
+            phoneNumber.UpdatePhoneNumber(number, type, isPrimary);
             return phoneNumber;
         }
 
-        public void SetPhoneNumber(string number, string type, bool isPrimary)
+        public void UpdatePhoneNumber(string number, string type, bool isPrimary)
         {
             Number = number;
             Type = type;

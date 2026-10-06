@@ -4,14 +4,14 @@ using System.Text;
 
 namespace ContactsApp.Application.Contacts.Models
 {
-    public record ContactDTO(string FirstName,
+    public sealed record ContactDTO(string FirstName,
         string Surname,
         string DateOfBirth,
-        string IBAN,
-        IReadOnlyCollection<PhoneNumberDTO> PhoneNumbers,
         string Country,
         string City,
         string PostalCode,
-        string Street
+        string Street,
+        string IBAN,
+        IReadOnlyCollection<PhoneNumberDTO> PhoneNumbers
     );
 }

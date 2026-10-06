@@ -22,12 +22,12 @@ namespace ContactsApp.API.Controllers
             var command = new CreateContactCommand(contact.FirstName,
                 contact.Surname,
                 DateOnly.Parse(contact.DateOfBirth),
-                contact.IBAN,
-                contact.PhoneNumbers,
                 contact.Country,
                 contact.City,
                 contact.PostalCode,
-                contact.Street
+                contact.Street,
+                contact.IBAN,
+                contact.PhoneNumbers
             );
 
             await _createContactCommandHandler.HandleAsync(command, cancellationToken);

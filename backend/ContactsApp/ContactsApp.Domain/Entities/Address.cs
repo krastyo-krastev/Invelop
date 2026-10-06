@@ -4,7 +4,7 @@ using System.Text;
 
 namespace ContactsApp.Domain.Entities
 {
-    public class Address
+    public sealed class Address
     {
         public string Country { get; private set; } = string.Empty;
 
