@@ -10,15 +10,21 @@ namespace ContactsApp.API.Controllers
     public class ContactsController : ControllerBase
     {
         private readonly ICommandHandler<CreateContactCommand> _createContactCommandHandler;
+        private readonly ILogger<ContactsController> _logger;
 
-        public ContactsController(ICommandHandler<CreateContactCommand> createContactCommandHandler)
+        public ContactsController(ICommandHandler<CreateContactCommand> createContactCommandHandler,
+            ILogger<ContactsController> logger   
+        )
         {
             _createContactCommandHandler = createContactCommandHandler;
+            _logger = logger;
         }
 
         [HttpPost]
         public async Task<ActionResult> CreateContacts([FromBody] ContactDTO contact, CancellationToken cancellationToken)
         {
+            _logger.LogInformation($"Received request to create contact: {@contact.FirstName} {@contact.Surname}");
+
             var command = new CreateContactCommand(contact.FirstName,
                 contact.Surname,
                 DateOnly.Parse(contact.DateOfBirth),
