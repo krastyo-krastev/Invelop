@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ContactsApp.Domain.Exceptions;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -63,7 +64,7 @@ namespace ContactsApp.Domain.Entities
             var sixteen = dateOfBirth.AddYears(MinAge).ToDateTime(TimeOnly.MinValue);
             if (sixteen > DateTime.Now)
             {
-                throw new ArgumentException("The contact must be at least 16 years old.");
+                throw new DomainException("The contact must be at least 16 years old.");
             }
 
             FirstName = firstName;
@@ -90,13 +91,13 @@ namespace ContactsApp.Domain.Entities
             // The contact should have at least one phone number
             if (phoneNumbers == null || phoneNumbers.Count == 0)
             {
-                throw new ArgumentException("The contact must have at least one phone number.");
+                throw new DomainException("The contact must have at least one phone number.");
             }
 
             // The contact should have exactly one primary phone number
             if (phoneNumbers.Where(p => p.IsPrimary).Count() != 1)
             {
-                throw new ArgumentException("The contact must have exactly one primary phone number.");
+                throw new DomainException("The contact must have exactly one primary phone number.");
             }
 
             _phoneNumbers.Clear();

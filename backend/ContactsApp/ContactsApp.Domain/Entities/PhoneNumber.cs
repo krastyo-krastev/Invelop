@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace ContactsApp.Domain.Entities
+﻿namespace ContactsApp.Domain.Entities
 {
     public sealed class PhoneNumber
     {
@@ -18,14 +14,21 @@ namespace ContactsApp.Domain.Entities
         {
         }
 
+        /// <summary>
+        /// Phone number factory method to create a new instance of PhoneNumber.
+        /// </summary>
+        /// <param name="number"></param>
+        /// <param name="type"></param>
+        /// <param name="isPrimary"></param>
+        /// <returns></returns>
         public static PhoneNumber Create(string number, string type, bool isPrimary)
         {
             var phoneNumber = new PhoneNumber();
-            phoneNumber.CreatePhoneNumber(number, type, isPrimary);
+            phoneNumber.SetPhoneNumber(number, type, isPrimary);
             return phoneNumber;
         }
 
-        public void CreatePhoneNumber(string number, string type, bool isPrimary)
+        public void SetPhoneNumber(string number, string type, bool isPrimary)
         {
             Number = number;
             Type = type;

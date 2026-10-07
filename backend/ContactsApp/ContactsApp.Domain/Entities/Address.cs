@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ContactsApp.Domain.Exceptions;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -54,7 +55,7 @@ namespace ContactsApp.Domain.Entities
         {
             if (address == null)
             {
-                throw new ArgumentNullException(nameof(address));
+                throw new DomainException("The address cannot be empty.");
             }
             SetAddress(address.Country, address.City, address.PostalCode, address.Street);
         }

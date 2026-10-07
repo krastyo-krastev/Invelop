@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Net;
+using System.Text.Json.Serialization;
 
 namespace ContactsApp.API.Models;
 
@@ -69,6 +70,15 @@ public class ErrorResponse
     /// </summary>
     public static ErrorResponse ValidationError(string message, string? requestId = null, Dictionary<string, object>? details = null)
     {
-        return Create("VALIDATION_ERROR", message, 400, requestId, details);
+        return Create("VALIDATION_ERROR", message, (int)HttpStatusCode.BadRequest, requestId, details);
     }
+
+    /// <summary>
+    /// Create error response for domain rule failures
+    /// </summary>
+    public static ErrorResponse DomainError(string message, string? requestId = null, Dictionary<string, object>? details = null)
+    {
+        return Create("DOMAIN_ERROR", message, (int)HttpStatusCode.UnprocessableEntity, requestId, details);
+    }
+
 }

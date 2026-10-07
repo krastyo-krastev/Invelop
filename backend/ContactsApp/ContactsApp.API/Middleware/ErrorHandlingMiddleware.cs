@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Text.Json;
 using ContactsApp.API.Models;
+using ContactsApp.Domain.Exceptions;
 
 namespace ContactsApp.API.Middleware;
 
@@ -39,14 +40,8 @@ public class ErrorHandlingMiddleware
 
         switch (exception)
         {
-            case HttpRequestException httpEx:
-                errorResponse = HandleHttpRequestException(httpEx, requestId);
-                break;
-            case TaskCanceledException taskEx when taskEx.InnerException is TimeoutException:
-                errorResponse = HandleTimeoutException(taskEx, requestId);
-                break;
-            case TimeoutException timeoutEx:
-                errorResponse = HandleTimeoutException(timeoutEx, requestId);
+            case DomainException domainEx:
+                errorResponse = HandleDomainException(domainEx, requestId);
                 break;
             case ArgumentException argEx:
                 errorResponse = HandleArgumentException(argEx, requestId);
@@ -59,40 +54,12 @@ public class ErrorHandlingMiddleware
         await WriteErrorResponseAsync(context, errorResponse);
     }
 
-    private ErrorResponse HandleHttpRequestException(HttpRequestException exception, string requestId)
+    private ErrorResponse HandleDomainException(DomainException exception, string requestId)
     {
-        _logger.LogWarning(exception, "HTTP request exception occurred during proxy operation");
+        _logger.LogWarning(exception, "Domain exception occurred");
 
-        // Determine appropriate status code based on the exception message or inner exception
-        var statusCode = HttpStatusCode.ServiceUnavailable; // Default to 503
-        var errorCode = "BACKEND_ERROR";
-
-        if (exception.Message.Contains("timeout", StringComparison.OrdinalIgnoreCase))
-        {
-            statusCode = HttpStatusCode.GatewayTimeout;
-            errorCode = "BACKEND_TIMEOUT";
-        }
-        else if (exception.Message.Contains("connection", StringComparison.OrdinalIgnoreCase))
-        {
-            errorCode = "BACKEND_CONNECTION_ERROR";
-        }
-
-        return ErrorResponse.Create(
-            errorCode,
-            "Backend service is temporarily unavailable",
-            (int)statusCode,
-            requestId
-        );
-    }
-
-    private ErrorResponse HandleTimeoutException(Exception exception, string requestId)
-    {
-        _logger.LogWarning(exception, "Request timeout occurred");
-
-        return ErrorResponse.Create(
-            "REQUEST_TIMEOUT",
-            "The request took too long to complete",
-            (int)HttpStatusCode.GatewayTimeout,
+        return ErrorResponse.DomainError(
+            exception.Message,
             requestId
         );
     }
