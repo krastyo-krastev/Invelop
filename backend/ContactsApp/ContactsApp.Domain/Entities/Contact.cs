@@ -21,51 +21,89 @@ namespace ContactsApp.Domain.Entities
         private readonly List<PhoneNumber> _phoneNumbers = new ();
         public IReadOnlyCollection<PhoneNumber> PhoneNumbers { get => _phoneNumbers; }
 
+        private const int MinAge = 16;
+
+
+        /// <summary>
+        /// Private constructor
+        /// </summary>
         private Contact()
         {
             Address = Address.Create(string.Empty, string.Empty, string.Empty, string.Empty);
         }
 
+        /// <summary>
+        /// Contact factory method to creates a new instance of Contact with the provided details.
+        /// </summary>
+        /// <param name="firstName"></param>
+        /// <param name="surname"></param>
+        /// <param name="dateOfBirth"></param>
+        /// <param name="address"></param>
+        /// <param name="iban"></param>
+        /// <returns></returns>
         public static Contact Create(string firstName, 
             string surname, 
             DateOnly dateOfBirth,
-            string country,
-            string city,
-            string postalCode,
-            string street,
+            Address address,
             string iban,
             IReadOnlyCollection<PhoneNumber> phoneNumbers
         )
         {
             var contact = new Contact();
-            contact.UpdatePersonalDetails(firstName, surname, dateOfBirth);
-            contact.UpdateAddress(country, city, postalCode, street);
-            contact.UpdateBankDetails(iban);
-            contact.UpdatePhoneNumbers(phoneNumbers);
+            contact.SetPersonalDetails(firstName, surname, dateOfBirth);
+            contact.SetAddress(address);
+            contact.SetBankDetails(iban);
+            contact.AddPhoneNumbers(phoneNumbers);
             return contact;
         }
 
-        public void UpdatePersonalDetails(string firstName, string surname, DateOnly dateOfBirth)
+        public void SetPersonalDetails(string firstName, string surname, DateOnly dateOfBirth)
         {
+            // The contact must be at least 16 years old
+            var sixteen = dateOfBirth.AddYears(MinAge).ToDateTime(TimeOnly.MinValue);
+            if (sixteen > DateTime.Now)
+            {
+                throw new ArgumentException("The contact must be at least 16 years old.");
+            }
+
             FirstName = firstName;
             Surname = surname;
             DateOfBirth = dateOfBirth;
         }
 
-        public void UpdateAddress(string country, string city, string postalCode, string street)
+        public void SetAddress(Address address)
         {
-            Address.SetAddress(country, city, postalCode, street);
+            Address.SetAddress(address);
         }
 
-        public void UpdateBankDetails(string iban)
+        public void SetBankDetails(string iban)
         {
             IBAN = iban;
         }
 
-        public void UpdatePhoneNumbers(IReadOnlyCollection<PhoneNumber> phoneNumbers)
+        /// <summary>
+        /// Reset the phone numbers list and add new ones.
+        /// </summary>
+        /// <param name="phoneNumbers"></param>
+        public void AddPhoneNumbers(IReadOnlyCollection<PhoneNumber> phoneNumbers)
         {
+            // The contact should have at least one phone number
+            if (phoneNumbers == null || phoneNumbers.Count == 0)
+            {
+                throw new ArgumentException("The contact must have at least one phone number.");
+            }
+
+            // The contact should have exactly one primary phone number
+            if (phoneNumbers.Where(p => p.IsPrimary).Count() != 1)
+            {
+                throw new ArgumentException("The contact must have exactly one primary phone number.");
+            }
+
             _phoneNumbers.Clear();
-            _phoneNumbers.AddRange(phoneNumbers);
+            foreach(var phoneNumber in phoneNumbers)
+            {
+                _phoneNumbers.Add(phoneNumber);
+            }
         }
     }
 }

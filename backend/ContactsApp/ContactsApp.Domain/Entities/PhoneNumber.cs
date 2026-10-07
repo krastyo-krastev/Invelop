@@ -21,11 +21,11 @@ namespace ContactsApp.Domain.Entities
         public static PhoneNumber Create(string number, string type, bool isPrimary)
         {
             var phoneNumber = new PhoneNumber();
-            phoneNumber.UpdatePhoneNumber(number, type, isPrimary);
+            phoneNumber.CreatePhoneNumber(number, type, isPrimary);
             return phoneNumber;
         }
 
-        public void UpdatePhoneNumber(string number, string type, bool isPrimary)
+        public void CreatePhoneNumber(string number, string type, bool isPrimary)
         {
             Number = number;
             Type = type;
