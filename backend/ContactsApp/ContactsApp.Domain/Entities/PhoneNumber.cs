@@ -6,6 +6,8 @@ namespace ContactsApp.Domain.Entities
 {
     public sealed class PhoneNumber
     {
+        public int Id { get; private set; }
+
         public string Number { get; private set; } = string.Empty;
 
         public string Type { get; private set; } = string.Empty;

@@ -12,7 +12,7 @@ public class Program
 
         // Add services to the container.
         builder.Services.AddApplicationServices();
-        builder.Services.AddInfrastructureServices();
+        builder.Services.AddInfrastructureServices(builder.Configuration);
 
         builder.Services.AddControllers();
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi

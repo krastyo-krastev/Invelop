@@ -28,3 +28,21 @@ There are a few additional paradigms/technologies/techniques we are interested t
 - NGXS
 - Usage of a design framework, like PrimeNG or similar
 - Playwright or Cypress E2E test (1 is enough)
+
+### Notes
+- Database Migrations
+
+Go to the solution root folder:
+```
+backend/ContactsApp/
+```
+
+Create migration
+```
+dotnet ef migrations add InitialMigration --project ./ContactsApp.Infrastructure/ --startup-project ./ContactsApp.API/
+```
+
+Apply all pending migrations to the database
+```
+dotnet ef database update --project ./ContactsApp.Infrastructure/ --startup-project ./ContactsApp.API/
+```
