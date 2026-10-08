@@ -34,6 +34,7 @@ namespace ContactsApp.Application.Contacts.Commands.CreateContact
             var validationResult = await _validator.ValidateAsync(command, cancellationToken);
             if (!validationResult.IsValid)
             {
+                _logger.LogWarning("Invalid CreateContactCommand parameters.");
                 throw new ValidationException(validationResult.Errors);
             }
 
