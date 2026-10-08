@@ -2,6 +2,7 @@
 using System.Text.Json;
 using ContactsApp.API.Models;
 using ContactsApp.Domain.Exceptions;
+using FluentValidation;
 
 namespace ContactsApp.API.Middleware;
 
@@ -43,8 +44,8 @@ public class ErrorHandlingMiddleware
             case DomainException domainEx:
                 errorResponse = HandleDomainException(domainEx, requestId);
                 break;
-            case ArgumentException argEx:
-                errorResponse = HandleArgumentException(argEx, requestId);
+            case ValidationException validationEx:
+                errorResponse = HandleValidationException(validationEx, requestId);
                 break;
             default:
                 errorResponse = HandleGenericException(exception, requestId);
@@ -64,7 +65,7 @@ public class ErrorHandlingMiddleware
         );
     }
 
-    private ErrorResponse HandleArgumentException(ArgumentException exception, string requestId)
+    private ErrorResponse HandleValidationException(ValidationException exception, string requestId)
     {
         _logger.LogWarning(exception, "Validation error occurred");
 

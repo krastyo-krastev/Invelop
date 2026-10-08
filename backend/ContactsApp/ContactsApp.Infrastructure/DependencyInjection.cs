@@ -9,6 +9,11 @@ namespace ContactsApp.Infrastructure
 {
     public static class DependencyInjection
     {
+        /// <summary>
+        /// Configure DI services for the infrastructure layer.
+        /// </summary>
+        /// <param name="services"></param>
+        /// <returns></returns>
         public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddDbContext<ApplicationDbContext>(options =>

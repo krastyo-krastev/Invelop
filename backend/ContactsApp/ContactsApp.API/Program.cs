@@ -1,5 +1,6 @@
 
 using ContactsApp.API.Middleware;
+using ContactsApp.Application;
 using ContactsApp.Infrastructure;
 
 namespace ContactsApp.API;
