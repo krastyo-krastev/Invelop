@@ -15,18 +15,21 @@ public class Program
         builder.Services.AddApplicationServices();
         builder.Services.AddInfrastructureServices(builder.Configuration);
 
-#if DEBUG
         builder.Services.AddCors(options =>
         {
-            options.AddPolicy("AngularDev", policy =>
+            options.AddPolicy("AngularRequest", policy =>
             {
+                var origins = builder.Environment.IsDevelopment()
+                            ? new[] { "http://localhost:4200" }
+                            // TODO: Update the origin URL to match your Angular app's URL in production
+                            : new[] { "https://contacts.example.com" };
+
                 policy
-                    .WithOrigins("http://localhost:4200")
+                    .WithOrigins(origins)
                     .AllowAnyHeader()
                     .AllowAnyMethod();
             });
         });
-#endif
 
         builder.Services.AddControllers();
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -45,9 +48,8 @@ public class Program
 
         app.UseHttpsRedirection();
 
-#if DEBUG
-        app.UseCors("AngularDev");
-#endif
+        app.UseCors("AngularRequest");
+
         app.UseAuthorization();
 
         app.MapControllers();
