@@ -15,6 +15,19 @@ public class Program
         builder.Services.AddApplicationServices();
         builder.Services.AddInfrastructureServices(builder.Configuration);
 
+#if DEBUG
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("AngularDev", policy =>
+            {
+                policy
+                    .WithOrigins("http://localhost:4200")
+                    .AllowAnyHeader()
+                    .AllowAnyMethod();
+            });
+        });
+#endif
+
         builder.Services.AddControllers();
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         builder.Services.AddOpenApi();
@@ -32,6 +45,9 @@ public class Program
 
         app.UseHttpsRedirection();
 
+#if DEBUG
+        app.UseCors("AngularDev");
+#endif
         app.UseAuthorization();
 
         app.MapControllers();
