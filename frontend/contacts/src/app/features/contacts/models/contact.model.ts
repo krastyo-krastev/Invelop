@@ -1,4 +1,5 @@
-export interface ContactSummaryDto {
+export interface ContactSummary {
+    id: number;
     firstName: string;
     surname: string;
     country: string;
