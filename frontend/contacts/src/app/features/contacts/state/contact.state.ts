@@ -6,9 +6,11 @@ import { ContactService } from '../services/contact.service';
 import { ContactSummary } from '../models/contact.model';
 import { LoadContacts } from './contact.actions'
 import { HttpErrorResponse } from '@angular/common/http';
+import { PaginationDto } from '../dtos/pagination.dto';
 
 export interface ContactStateModel {
   contacts: ContactSummary[];
+  pagination: PaginationDto;
   loading: boolean;
   error: string | null;
 }
@@ -17,6 +19,7 @@ export interface ContactStateModel {
   name: 'contact',
   defaults: {
     contacts: [],
+    pagination: { page: 1, pageSize: 10, total: 0, totalPages: 0, hasNextPage: false, hasPreviousPage: false },
     loading: false,
     error: null
   }
@@ -25,6 +28,7 @@ export interface ContactStateModel {
 export class ContactState {
   constructor(private contactService: ContactService) {}
 
+    /* Contacts Selectors */
   @Selector()
   static contacts(state: ContactStateModel) {
     return state.contacts;
@@ -40,6 +44,12 @@ export class ContactState {
     return state.error;
   }
 
+  @Selector()
+  static pagination(state: ContactStateModel) {
+    return state.pagination;
+  }
+
+  /* Contacts Actions */
   @Action(LoadContacts)
   loadContacts(
     ctx: StateContext<ContactStateModel>,
@@ -53,6 +63,7 @@ export class ContactState {
         tap(response => {
           ctx.patchState({
             contacts: response.data,
+            pagination: response.pagination,
             loading: false
           });
         }),

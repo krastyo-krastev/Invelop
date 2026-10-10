@@ -52,6 +52,8 @@ namespace ContactsApp.API.Controllers
         {
             _logger.LogInformation($"Received request to get contacts with page: {page} and pageSize: {pageSize}", page, pageSize);
 
+            Thread.Sleep(5000);
+
             var query = new GetContactsPaginatedQuery(page, pageSize);
             var result = await _getContactsPaginatedHandler.HandleAsync(query, cancellationToken);
             return Ok(result);

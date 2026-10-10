@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
-import { TableModule } from 'primeng/table';
+import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { Store } from '@ngxs/store';
@@ -9,6 +9,9 @@ import { ContactSummary } from '../../models/contact.model';
 import { ContactState } from '../../state/contact.state';
 import { LoadContacts } from '../../state/contact.actions';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { MenuItem } from 'primeng/api';
+import { Menu } from 'primeng/menu';
+import { Button } from 'primeng/button';
 
 @Component({
   imports: [
@@ -16,7 +19,9 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
     TableModule, 
     ButtonModule, 
     CardModule, 
-    ProgressSpinnerModule
+    ProgressSpinnerModule,
+    Menu,
+    Button
   ],
   selector: 'app-contact-list',
   styleUrl: './contact-list.component.css',
@@ -30,7 +35,56 @@ export class ContactListComponent {
 
   loading$ = this.store.select(ContactState.loading);
 
+  error$ = this.store.select(ContactState.error);
+
+  pagination$ = this.store.select(ContactState.pagination);
+
+  menuItems: MenuItem[] = [];
+
   ngOnInit() {
-    this.store.dispatch(new LoadContacts(1, 10));
   }
+
+  onLazyLoad(event: TableLazyLoadEvent): void {
+    const pageSize = event.rows ?? 10;
+    const page = Math.floor((event.first ?? 0) / pageSize) + 1;
+
+    this.store.dispatch(new LoadContacts(page, pageSize));
+  }
+
+  openMenu(event: MouseEvent, contact: ContactSummary, menu: Menu): void {
+    this.menuItems = [
+      {
+        label: 'View',
+        icon: 'pi pi-eye',
+        command: () => this.viewContact(contact)
+      },
+      {
+        label: 'Edit',
+        icon: 'pi pi-pencil',
+        command: () => this.editContact(contact)
+      },
+      {
+        separator: true
+      },
+      {
+        label: 'Delete',
+        icon: 'pi pi-trash',
+        command: () => this.deleteContact(contact)
+      }
+    ];
+
+    menu.toggle(event);
+  }
+
+  viewContact(contact: ContactSummary): void {
+    console.log('View contact:', contact.id);
+  }
+
+  editContact(contact: ContactSummary): void {
+    console.log('Edit contact:', contact.id);
+  }
+
+  deleteContact(contact: ContactSummary): void {
+    console.log('Delete contact:', contact.id);
+  }  
 }

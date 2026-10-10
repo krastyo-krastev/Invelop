@@ -3,5 +3,5 @@ import { PaginationDto } from "./pagination.dto";
 
 export interface GetContactsSummaryResponse{
     data: ContactSummary[];
-    meta: PaginationDto;
+    pagination: PaginationDto;
 }
