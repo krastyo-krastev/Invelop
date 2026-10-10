@@ -86,5 +86,9 @@ export class ContactListComponent {
 
   deleteContact(contact: ContactSummary): void {
     console.log('Delete contact:', contact.id);
-  }  
+  } 
+  
+  addContact(): void {
+    console.log('Add new contact');
+  }
 }

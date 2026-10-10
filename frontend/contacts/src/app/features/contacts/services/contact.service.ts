@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { GetContactsSummaryResponse } from '../dtos/contacts.dto';
+import { GetContactResponse, GetContactsSummaryResponse } from '../dtos/contacts.dto';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { API_BASE_URL } from '../../../core/tokens/api-url.token';
 
@@ -19,4 +19,9 @@ export class ContactService {
     const url = `${this.apiBaseUrl}/contacts`;
     return this.http.get<GetContactsSummaryResponse>(url, { params });
   }
+
+  getContact(id: number): Observable<GetContactResponse> {
+    const url = `${this.apiBaseUrl}/contacts/${id}`;
+    return this.http.get<GetContactResponse>(url);
+  }  
 }

@@ -3,13 +3,14 @@ import { State, Action, StateContext, Selector } from '@ngxs/store';
 import { EMPTY, tap, catchError } from 'rxjs';
 
 import { ContactService } from '../services/contact.service';
-import { ContactSummary } from '../models/contact.model';
+import { Contact, ContactSummary } from '../models/contact.model';
 import { LoadContacts } from './contact.actions'
 import { HttpErrorResponse } from '@angular/common/http';
 import { PaginationDto } from '../dtos/pagination.dto';
 
 export interface ContactStateModel {
   contacts: ContactSummary[];
+  selectedContact: Contact | null;
   pagination: PaginationDto;
   loading: boolean;
   error: string | null;
@@ -19,6 +20,7 @@ export interface ContactStateModel {
   name: 'contact',
   defaults: {
     contacts: [],
+    selectedContact: null,
     pagination: { page: 1, pageSize: 10, total: 0, totalPages: 0, hasNextPage: false, hasPreviousPage: false },
     loading: false,
     error: null
@@ -47,6 +49,11 @@ export class ContactState {
   @Selector()
   static pagination(state: ContactStateModel) {
     return state.pagination;
+  }
+
+  @Selector()
+  static selectedContact(state: ContactStateModel) {
+    return state.selectedContact;
   }
 
   /* Contacts Actions */

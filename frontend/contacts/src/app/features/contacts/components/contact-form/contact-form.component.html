@@ -1,2 +1,208 @@
-<p>contact-form.component works!</p>
 
+<form [formGroup]="form" (ngSubmit)="save()" class="contact-form">
+  <div class="form-header">
+    <h2>{{ isEditMode() ? 'Edit Contact' : 'Create Contact' }}</h2>
+  </div>
+
+  @if (loadError()) {
+    <p-message severity="error" [text]="loadError()!" />
+  }
+
+  <section class="form-section">
+    <h3>Personal Information</h3>
+
+    <div class="form-grid">
+      <div class="field">
+        <label for="firstName">First Name</label>
+        <input
+          id="firstName"
+          pInputText
+          formControlName="firstName"
+          maxlength="100"
+          class="w-full"
+        />
+        @if (form.controls.firstName.touched &&
+             form.controls.firstName.hasError('required')) {
+          <small class="error">First name is required.</small>
+        }
+      </div>
+
+      <div class="field">
+        <label for="surname">Surname</label>
+        <input
+          id="surname"
+          pInputText
+          formControlName="surname"
+          maxlength="100"
+          class="w-full"
+        />
+        @if (form.controls.surname.touched &&
+             form.controls.surname.hasError('required')) {
+          <small class="error">Surname is required.</small>
+        }
+      </div>
+
+      <div class="field">
+        <label for="dateOfBirth">Date of Birth</label>
+        <p-datepicker
+          inputId="dateOfBirth"
+          formControlName="dateOfBirth"
+          dateFormat="dd.mm.yy"
+          [showIcon]="true"
+          [maxDate]="today"
+          [showButtonBar]="true"
+          class="w-full"
+        />
+      </div>
+
+      <div class="field">
+        <label for="iban">IBAN</label>
+        <input
+          id="iban"
+          pInputText
+          formControlName="iban"
+          maxlength="34"
+          class="w-full"
+        />
+      </div>
+
+      <div class="field full-width">
+        <label for="country">Country</label>
+        <input
+          id="country"
+          pInputText
+          formControlName="country"
+          maxlength="250"
+          class="w-full"
+        />
+      </div>
+
+      <div class="field full-width">
+        <label for="city">City</label>
+        <input
+          id="city"
+          pInputText
+          formControlName="city"
+          maxlength="250"
+          class="w-full"
+        />
+      </div>      
+    </div>
+
+    <div class="field full-width">
+        <label for="postalCode">Postal Code</label>
+        <input
+            id="postalCode"
+            pInputText
+            formControlName="postalCode"
+            maxlength="250"
+            class="w-full"
+        />
+    </div>
+
+    <div class="field full-width">
+        <label for="street">Street</label>
+        <input
+            id="street"
+            pInputText
+            formControlName="street"
+            maxlength="250"
+            class="w-full"
+        />
+    </div>    
+  </section>
+
+  <section class="form-section">
+    <div class="section-header">
+      <h3>Phone Numbers</h3>
+
+      <p-button
+        type="button"
+        label="Add Phone"
+        icon="pi pi-plus"
+        severity="secondary"
+        [outlined]="true"
+        (onClick)="addPhone()"
+      />
+    </div>
+
+    <div formArrayName="phoneNumbers" class="phone-list">
+      @for (phone of phoneNumbers.controls; track phone; let i = $index) {
+        <div class="phone-row" [formGroup]="phone">
+          <div class="field phone-number">
+            <label [for]="'phone-' + i">Phone Number</label>
+            <input
+              [id]="'phone-' + i"
+              pInputText
+              formControlName="number"
+              maxlength="30"
+              class="w-full"
+            />
+            @if (phone.controls.number.touched &&
+                 phone.controls.number.hasError('required')) {
+              <small class="error">Phone number is required.</small>
+            }
+          </div>
+
+          <div class="field phone-type">
+            <label [for]="'type-' + i">Type</label>
+            <p-select
+              [inputId]="'type-' + i"
+              formControlName="type"
+              [options]="phoneTypes"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="Select type"
+              styleClass="w-full"
+            />
+          </div>
+
+          <div class="field primary-field">
+            <label [for]="'primary-' + i">Primary</label>
+            <p-checkbox
+              [inputId]="'primary-' + i"
+              formControlName="isPrimary"
+              [binary]="true"
+              (onChange)="setPrimaryPhone(i, $event.checked)"
+            />
+          </div>
+
+          <div class="remove-field">
+            <p-button
+              type="button"
+              icon="pi pi-trash"
+              severity="danger"
+              [text]="true"
+              [rounded]="true"
+              [disabled]="phoneNumbers.length === 1"
+              [ariaLabel]="'Remove phone number ' + (i + 1)"
+              (onClick)="removePhone(i)"
+            />
+          </div>
+        </div>
+      }
+
+      @if (phoneNumbers.length === 0) {
+        <p class="empty-state">No phone numbers added.</p>
+      }
+    </div>
+  </section>
+
+  <div class="form-actions">
+    <p-button
+      type="button"
+      label="Cancel"
+      severity="secondary"
+      [outlined]="true"
+      (onClick)="cancel()"
+    />
+
+    <p-button
+      type="submit"
+      [label]="isEditMode() ? 'Save Changes' : 'Create Contact'"
+      icon="pi pi-check"
+      [loading]="saving()"
+      [disabled]="saving()"
+    />
+  </div>
+</form>
