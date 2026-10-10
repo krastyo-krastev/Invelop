@@ -25,6 +25,33 @@ namespace ContactsApp.Infrastructure.Data.Repositories
             await _context.Contacts.AddAsync(contact, cancellationToken);
         }
 
+        public async Task<ContactDTO?> GetContactByIdAsync(int id, CancellationToken cancellationToken)
+        {
+            var contact = await _context.Contacts.SingleOrDefaultAsync(c => c.Id == id);
+            if (contact != null)
+            {
+                var contactDto = new ContactDTO(
+                    contact.Id,
+                    contact.FirstName,
+                    contact.Surname,
+                    contact.DateOfBirth.ToShortDateString(),
+                    contact.Address.Country,
+                    contact.Address.City,
+                    contact.Address.PostalCode,
+                    contact.Address.Street,
+                    contact.IBAN,
+                    contact.PhoneNumbers
+                        .Select(p => new PhoneNumberDTO(p.Number, p.Type, p.IsPrimary))
+                        .ToList()
+                );
+                return contactDto;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
         public async Task<PaginatedResult<ContactSummaryDTO>> GetContactsPaginatedAsync(int page, int pageSize, CancellationToken cancellationToken)
         {
             var query = _context.Contacts

@@ -3,6 +3,7 @@ using ContactsApp.Application.Abstractions;
 using ContactsApp.Application.Contacts.Commands.CreateContact;
 using ContactsApp.Application.Contacts.Models;
 using ContactsApp.Application.Contacts.Queries.GetContactsPaginated;
+using ContactsApp.Application.Contacts.Queries.GetContact;
 
 namespace ContactsApp.API.Controllers
 {
@@ -12,15 +13,18 @@ namespace ContactsApp.API.Controllers
     {
         private readonly ICommandHandler<CreateContactCommand> _createContactCommandHandler;
         private readonly IQueryHandler<GetContactsPaginatedQuery, PaginatedResult<ContactSummaryDTO>> _getContactsPaginatedHandler;
+        private readonly IQueryHandler<GetContactByIdQuery, ContactDTO> _getContactByIdHandler;
         private readonly ILogger<ContactsController> _logger;
 
         public ContactsController(ICommandHandler<CreateContactCommand> createContactCommandHandler,
             IQueryHandler<GetContactsPaginatedQuery, PaginatedResult<ContactSummaryDTO>> getContactsPaginatedHandler,
+            IQueryHandler<GetContactByIdQuery, ContactDTO> getContactByIdHandler,
             ILogger<ContactsController> logger   
         )
         {
             _createContactCommandHandler = createContactCommandHandler;
             _getContactsPaginatedHandler = getContactsPaginatedHandler;
+            _getContactByIdHandler = getContactByIdHandler;
             _logger = logger;
         }
 
@@ -52,11 +56,19 @@ namespace ContactsApp.API.Controllers
         {
             _logger.LogInformation($"Received request to get contacts with page: {page} and pageSize: {pageSize}", page, pageSize);
 
-            Thread.Sleep(5000);
-
             var query = new GetContactsPaginatedQuery(page, pageSize);
             var result = await _getContactsPaginatedHandler.HandleAsync(query, cancellationToken);
             return Ok(result);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<ContactDTO>> GetContactById([FromRoute] int id, CancellationToken cancellationToken = default)
+        {
+            _logger.LogInformation($"Received request to get contact with ID: {id}", id);
+
+            var query = new GetContactByIdQuery(id);
+            var result = await _getContactByIdHandler.HandleAsync(query, cancellationToken);
+            return result != null ? Ok(result) : NotFound();
         }
     }
 }

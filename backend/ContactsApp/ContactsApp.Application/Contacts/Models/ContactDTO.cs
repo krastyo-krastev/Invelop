@@ -4,7 +4,9 @@ using System.Text;
 
 namespace ContactsApp.Application.Contacts.Models
 {
-    public sealed record ContactDTO(string FirstName,
+    public sealed record ContactDTO(
+        int Id,
+        string FirstName,
         string Surname,
         string DateOfBirth,
         string Country,

@@ -8,5 +8,7 @@ namespace ContactsApp.Application.Common.Interfaces
         Task AddContact(Contact contact, CancellationToken cancellationToken);
 
         Task<PaginatedResult<ContactSummaryDTO>> GetContactsPaginatedAsync(int page, int pageSize, CancellationToken cancellationToken);
+
+        Task<ContactDTO?> GetContactByIdAsync(int id, CancellationToken cancellationToken);
     }
 }

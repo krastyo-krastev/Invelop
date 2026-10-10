@@ -4,6 +4,7 @@ using ContactsApp.Application.Contacts.Commands.CreateContact;
 using FluentValidation;
 using ContactsApp.Application.Contacts.Queries.GetContactsPaginated;
 using ContactsApp.Application.Contacts.Models;
+using ContactsApp.Application.Contacts.Queries.GetContact;
 
 namespace ContactsApp.Application
 {
@@ -21,6 +22,9 @@ namespace ContactsApp.Application
 
             services.AddScoped<IQueryHandler<GetContactsPaginatedQuery, PaginatedResult<ContactSummaryDTO>>, GetContactsPaginatedHandler>();
             services.AddScoped<IValidator<GetContactsPaginatedQuery>, GetContactsPaginatedValidator>();
+
+            services.AddScoped<IQueryHandler<GetContactByIdQuery, ContactDTO>, GetContactByIdHandler>();
+            services.AddScoped<IValidator<GetContactByIdQuery>, GetContactByIdValidator>();
 
             return services;
         }
