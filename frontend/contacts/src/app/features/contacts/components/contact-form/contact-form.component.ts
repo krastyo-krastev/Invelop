@@ -10,7 +10,7 @@ import { Checkbox } from 'primeng/checkbox';
 import { Button } from 'primeng/button';
 import { Message } from 'primeng/message';
 import { Contact } from '../../models/contact.model';
-import { CreateContact, LoadContact, UpdateContact } from '../../state/contact.actions';
+import { CreateContact, LoadContactById, UpdateContact } from '../../state/contact.actions';
 import { SaveContactRequest } from '../../dtos/contacts.dto';
 import { ContactState } from '../../state/contact.state';
 
@@ -52,10 +52,7 @@ export class ContactFormComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
 
-  readonly contactId = signal<string | null>(
-    this.route.snapshot.paramMap.get('id')
-  );
-
+  readonly contactId = signal<number | null>(null);
   readonly isEditMode = computed(() => this.contactId() !== null);
   readonly saving = signal(false);
   readonly loadError = signal<string | null>(null);
@@ -89,11 +86,11 @@ export class ContactFormComponent {
     ]),
     postalCode: this.fb.nonNullable.control('', [
       Validators.required,
-      Validators.maxLength(100)
+      Validators.maxLength(20)
     ]),
     street: this.fb.nonNullable.control('', [
       Validators.required,
-      Validators.maxLength(250)
+      Validators.maxLength(200)
     ]),
     iban: this.fb.nonNullable.control('', [
       Validators.maxLength(34)
@@ -106,9 +103,10 @@ export class ContactFormComponent {
   }
   
   ngOnInit(): void {
-    const id = this.contactId();
+    const id = Number(this.route.snapshot.paramMap.get('id'));
     if (id) {
-      this.store.dispatch(new LoadContact(id)).subscribe({
+      this.contactId.set(id);
+      this.store.dispatch(new LoadContactById(id)).subscribe({
         next: () => {
           const contact = this.store.selectSnapshot(
             ContactState.selectedContact
@@ -137,7 +135,7 @@ export class ContactFormComponent {
     return this.fb.group<PhoneForm>({
       number: this.fb.nonNullable.control(phone?.number ?? '', [
         Validators.required,
-        Validators.maxLength(30)
+        Validators.maxLength(50)
       ]),
       type: this.fb.nonNullable.control(
         phone?.type ?? 'Mobile',
@@ -172,6 +170,7 @@ export class ContactFormComponent {
       dateOfBirth: new Date(contact.dateOfBirth),
       country: contact.country,
       city: contact.city,
+      postalCode: contact.postalCode,
       street: contact.street,
       iban: contact.iban
     });
@@ -193,7 +192,7 @@ export class ContactFormComponent {
     const value = this.form.getRawValue();
 
     const request: SaveContactRequest = {
-      id: this.isEditMode() ? this.contactId()! : "0",
+      id: this.isEditMode() ? this.contactId()! : 0,
       firstName: value.firstName.trim(),
       surname: value.surname.trim(),
       dateOfBirth: value.dateOfBirth

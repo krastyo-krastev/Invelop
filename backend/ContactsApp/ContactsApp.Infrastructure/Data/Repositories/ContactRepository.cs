@@ -27,7 +27,10 @@ namespace ContactsApp.Infrastructure.Data.Repositories
 
         public async Task<ContactDTO?> GetContactByIdAsync(int id, CancellationToken cancellationToken)
         {
-            var contact = await _context.Contacts.SingleOrDefaultAsync(c => c.Id == id);
+            var contact = await _context.Contacts
+                .Include(c => c.PhoneNumbers)
+                .AsNoTracking()
+                .SingleOrDefaultAsync(c => c.Id == id);
             if (contact != null)
             {
                 var contactDto = new ContactDTO(

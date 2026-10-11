@@ -14,13 +14,14 @@ export interface GetContactResponse {
     dateOfBirth: string;
     country: string;
     city: string;
+    postalCode: string;
     street: string;
     iban: string;
     phoneNumbers: PhoneNumber[];
 }
 
 export interface SaveContactRequest {
-    id: string;    
+    id: number;    
     firstName: string;
     surname: string;
     dateOfBirth: string | null;

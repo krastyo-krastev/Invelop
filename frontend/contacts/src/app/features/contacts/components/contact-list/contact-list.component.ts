@@ -12,13 +12,14 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { MenuItem } from 'primeng/api';
 import { Menu } from 'primeng/menu';
 import { Button } from 'primeng/button';
+import { Router } from '@angular/router';
 
 @Component({
   imports: [
     AsyncPipe,
-    TableModule, 
-    ButtonModule, 
-    CardModule, 
+    TableModule,
+    ButtonModule,
+    CardModule,
     ProgressSpinnerModule,
     Menu,
     Button
@@ -29,7 +30,8 @@ import { Button } from 'primeng/button';
 })
 export class ContactListComponent {
   private store = inject(Store);
-  
+  private readonly router = inject(Router);
+
   contacts$: Observable<ContactSummary[]> =
     this.store.select(ContactState.contacts);
 
@@ -54,11 +56,6 @@ export class ContactListComponent {
   openMenu(event: MouseEvent, contact: ContactSummary, menu: Menu): void {
     this.menuItems = [
       {
-        label: 'View',
-        icon: 'pi pi-eye',
-        command: () => this.viewContact(contact)
-      },
-      {
         label: 'Edit',
         icon: 'pi pi-pencil',
         command: () => this.editContact(contact)
@@ -76,19 +73,15 @@ export class ContactListComponent {
     menu.toggle(event);
   }
 
-  viewContact(contact: ContactSummary): void {
-    console.log('View contact:', contact.id);
-  }
-
   editContact(contact: ContactSummary): void {
-    console.log('Edit contact:', contact.id);
+    this.router.navigate(['/contacts', contact.id, 'edit']);
   }
 
   deleteContact(contact: ContactSummary): void {
     console.log('Delete contact:', contact.id);
-  } 
-  
+  }
+
   addContact(): void {
-    console.log('Add new contact');
+    this.router.navigate(['/contacts']);
   }
 }

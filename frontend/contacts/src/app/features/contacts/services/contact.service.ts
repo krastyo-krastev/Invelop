@@ -20,7 +20,7 @@ export class ContactService {
     return this.http.get<GetContactsSummaryResponse>(url, { params });
   }
 
-  getContact(id: number): Observable<GetContactResponse> {
+  getContactById(id: number): Observable<GetContactResponse> {
     const url = `${this.apiBaseUrl}/contacts/${id}`;
     return this.http.get<GetContactResponse>(url);
   }  

@@ -16,6 +16,7 @@ export interface Contact {
     dateOfBirth: string;
     country: string;
     city: string;
+    postalCode: string;
     street: string;
     iban: string;
     phoneNumbers: PhoneNumber[];

@@ -9,9 +9,9 @@ export class LoadContacts {
   ) {}
 }
 
-export class LoadContact {
+export class LoadContactById {
   static readonly type = '[Contact] Load';
-  constructor(public readonly id: string) {}
+  constructor(public readonly id: number) {}
 }
 
 export class CreateContact {
