@@ -30,7 +30,7 @@ namespace ContactsApp.Infrastructure.Data.Repositories
             var contact = await _context.Contacts
                 .Include(c => c.PhoneNumbers)
                 .AsNoTracking()
-                .SingleOrDefaultAsync(c => c.Id == id);
+                .SingleOrDefaultAsync(c => c.Id == id, cancellationToken);
             if (contact != null)
             {
                 var contactDto = new ContactDTO(
@@ -44,7 +44,7 @@ namespace ContactsApp.Infrastructure.Data.Repositories
                     contact.Address.Street,
                     contact.IBAN,
                     contact.PhoneNumbers
-                        .Select(p => new PhoneNumberDTO(p.Number, p.Type, p.IsPrimary))
+                        .Select(p => new PhoneNumberDTO(p.Id, p.Number, p.Type, p.IsPrimary))
                         .ToList()
                 );
                 return contactDto;
@@ -53,6 +53,14 @@ namespace ContactsApp.Infrastructure.Data.Repositories
             {
                 return null;
             }
+        }
+
+        public Task<Contact?> GetContactByIdForUpdateAsync(int id, CancellationToken cancellationToken)
+        {
+            var contact = _context.Contacts
+                .Include(c => c.PhoneNumbers)
+                .SingleOrDefaultAsync(c => c.Id == id, cancellationToken);
+            return contact;
         }
 
         public async Task<PaginatedResult<ContactSummaryDTO>> GetContactsPaginatedAsync(int page, int pageSize, CancellationToken cancellationToken)

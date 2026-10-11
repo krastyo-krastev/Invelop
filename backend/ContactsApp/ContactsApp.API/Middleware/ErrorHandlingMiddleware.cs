@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Text.Json;
 using ContactsApp.API.Models;
+using ContactsApp.Application.Common.Exceptions;
 using ContactsApp.Domain.Exceptions;
 using FluentValidation;
 
@@ -47,6 +48,13 @@ public class ErrorHandlingMiddleware
             case ValidationException validationEx:
                 errorResponse = HandleValidationException(validationEx, requestId);
                 break;
+            case ArgumentException argumentEx:
+                errorResponse = HandleArgumentException(argumentEx, requestId);
+                break;
+            case NotFoundException notFoundEx:
+                errorResponse = HandleNotFoundException(notFoundEx, requestId);
+                break;
+
             default:
                 errorResponse = HandleGenericException(exception, requestId);
                 break;
@@ -70,6 +78,26 @@ public class ErrorHandlingMiddleware
         _logger.LogWarning(exception, "Validation error occurred");
 
         return ErrorResponse.ValidationError(
+            exception.Message,
+            requestId
+        );
+    }
+    
+    private ErrorResponse HandleArgumentException(ArgumentException exception, string requestId)
+    {
+        _logger.LogWarning(exception, "Argument error occurred");
+
+        return ErrorResponse.ArgumentError(
+            exception.Message,
+            requestId
+        );
+    }
+
+    private ErrorResponse HandleNotFoundException(NotFoundException exception, string requestId)
+    {
+        _logger.LogWarning(exception, "Not found error occurred");
+
+        return ErrorResponse.NotFoundError(
             exception.Message,
             requestId
         );

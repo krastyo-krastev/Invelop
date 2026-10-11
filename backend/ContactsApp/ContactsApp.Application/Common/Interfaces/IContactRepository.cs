@@ -10,5 +10,7 @@ namespace ContactsApp.Application.Common.Interfaces
         Task<PaginatedResult<ContactSummaryDTO>> GetContactsPaginatedAsync(int page, int pageSize, CancellationToken cancellationToken);
 
         Task<ContactDTO?> GetContactByIdAsync(int id, CancellationToken cancellationToken);
+
+        Task<Contact?> GetContactByIdForUpdateAsync(int id, CancellationToken cancellationToken);
     }
 }

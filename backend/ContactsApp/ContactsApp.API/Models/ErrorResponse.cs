@@ -88,4 +88,12 @@ public class ErrorResponse
     {
         return Create("ARGUMENT_ERROR", message, (int)HttpStatusCode.BadRequest, requestId, details);
     }
+
+    /// <summary>
+    /// Create error response for entity not found
+    /// </summary>
+    public static ErrorResponse NotFoundError(string message, string? requestId = null, Dictionary<string, object>? details = null)
+    {
+        return Create("NOTFOUND_ERROR", message, (int)HttpStatusCode.NotFound, requestId, details);
+    }
 }

@@ -1,6 +1,8 @@
 ﻿using ContactsApp.Application.Abstractions;
+using ContactsApp.Application.Common.Exceptions;
 using ContactsApp.Application.Common.Interfaces;
 using ContactsApp.Domain.Entities;
+using ContactsApp.Domain.Models;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
 using System;
@@ -41,25 +43,25 @@ namespace ContactsApp.Application.Contacts.Commands.UpdateContact
                 throw new ValidationException(validationResult.Errors);
             }
 
-/* KMK
-            // Map value objects 
-            var address = Address.Create(command.Country, command.City, command.PostalCode, command.Street);
-            var phoneNumbers = command.PhoneNumbers
-                .Select(p => PhoneNumber.Create(p.Number, p.Type, p.IsPrimary))
-                .ToList();
+            var contact = await _contactRepository.GetContactByIdForUpdateAsync(command.Id, cancellationToken);
+            if (contact == null)
+            {
+                _logger.LogWarning($"Contact not found for update, id {command.Id}");
+                throw new NotFoundException("Contact not found for update");
+            }
 
-            // Create the contact entity
-            var contact = Contact.Create(
-                command.FirstName,
-                command.Surname,
-                command.DateOfBirth,
-                address,
-                command.IBAN,
-                phoneNumbers
-            );
-*/
-            // Save the contact to the database 
-//            await _contactRepository.UpdateContact(contact, cancellationToken);
+            // Update contact details
+            contact.SetPersonalDetails(command.FirstName, command.Surname, command.DateOfBirth);
+            contact.SetAddress(command.Country, command.City, command.PostalCode, command.Street);
+            contact.SetBankDetails(command.IBAN);
+
+            // Create new list from DTOs to update
+            var updatedPhonesList = command.PhoneNumbers
+                .Select(p => new PhoneNumberData(p.Id, p.Number, p.Type, p.IsPrimary))
+                .ToList();
+            contact.UpdatePhoneNumbers(updatedPhonesList);
+
+            // Save the updated contact to the database 
             var res = await _unitOfWork.SaveChangesAsync(cancellationToken);
         }
     }

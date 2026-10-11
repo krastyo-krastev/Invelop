@@ -1,4 +1,5 @@
 ﻿using ContactsApp.Domain.Exceptions;
+using ContactsApp.Domain.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -77,6 +78,11 @@ namespace ContactsApp.Domain.Entities
             Address.SetAddress(address);
         }
 
+        public void SetAddress(string country, string city, string postalCode, string street)
+        {
+            Address.SetAddress(country, city, postalCode, street);
+        }
+
         public void SetBankDetails(string iban)
         {
             IBAN = iban;
@@ -104,6 +110,43 @@ namespace ContactsApp.Domain.Entities
             foreach(var phoneNumber in phoneNumbers)
             {
                 _phoneNumbers.Add(phoneNumber);
+            }
+        }
+
+        /// <summary>
+        /// Update contact phones list
+        /// </summary>
+        /// <param name="updatedPhonesList"></param>
+        public void UpdatePhoneNumbers(IList<PhoneNumberData> updatedPhonesList)
+        {
+            // The contact should have at least one phone number
+            if (updatedPhonesList == null || updatedPhonesList.Count == 0)
+            {
+                throw new DomainException("The contact must have at least one phone number.");
+            }
+
+            // The contact should have exactly one primary phone number
+            if (updatedPhonesList.Where(p => p.IsPrimary).Count() != 1)
+            {
+                throw new DomainException("The contact must have exactly one primary phone number.");
+            }
+
+            // Remove deleted phones
+            var keepIds = updatedPhonesList.Select(p => p.Id).ToHashSet();
+            _phoneNumbers.RemoveAll(p => keepIds.Contains(p.Id) == false);
+
+            // Update or add existing phones
+            foreach (var phone in updatedPhonesList)
+            { 
+                var existing = _phoneNumbers.FirstOrDefault(p =>  p.Id == phone.Id);
+                if (existing != null)
+                {
+                    existing.SetPhoneNumber(phone.Number, phone.Type, phone.IsPrimary);
+                }
+                else
+                {
+                    _phoneNumbers.Add(PhoneNumber.Create(phone.Number, phone.Type, phone.IsPrimary));
+                }
             }
         }
     }

@@ -15,17 +15,20 @@ namespace ContactsApp.API.Controllers
     public class ContactsController : ControllerBase
     {
         private readonly ICommandHandler<CreateContactCommand> _createContactCommandHandler;
+        private readonly ICommandHandler<UpdateContactCommand> _updateContactCommandHandler;
         private readonly IQueryHandler<GetContactsPaginatedQuery, PaginatedResult<ContactSummaryDTO>> _getContactsPaginatedHandler;
-        private readonly IQueryHandler<GetContactByIdQuery, ContactDTO> _getContactByIdHandler;
+        private readonly IQueryHandler<GetContactByIdQuery, ContactDTO?> _getContactByIdHandler;
         private readonly ILogger<ContactsController> _logger;
 
         public ContactsController(ICommandHandler<CreateContactCommand> createContactCommandHandler,
+            ICommandHandler<UpdateContactCommand> updateContactCommandHandler,
             IQueryHandler<GetContactsPaginatedQuery, PaginatedResult<ContactSummaryDTO>> getContactsPaginatedHandler,
-            IQueryHandler<GetContactByIdQuery, ContactDTO> getContactByIdHandler,
+            IQueryHandler<GetContactByIdQuery, ContactDTO?> getContactByIdHandler,
             ILogger<ContactsController> logger   
         )
         {
             _createContactCommandHandler = createContactCommandHandler;
+            _updateContactCommandHandler = updateContactCommandHandler;
             _getContactsPaginatedHandler = getContactsPaginatedHandler;
             _getContactByIdHandler = getContactByIdHandler;
             _logger = logger;
@@ -81,7 +84,7 @@ namespace ContactsApp.API.Controllers
             return Ok();
         }
 
-        [HttpPut("{id}")]
+        [HttpPut]
         public async Task<ActionResult> UpdateContact([FromBody] ContactDTO contact, CancellationToken cancellationToken = default)
         {
             _logger.LogInformation($"Received request to update contact with ID: {contact?.Id}");
@@ -104,6 +107,7 @@ namespace ContactsApp.API.Controllers
                 contact.IBAN,
                 contact.PhoneNumbers);
 
+            await _updateContactCommandHandler.HandleAsync(command, cancellationToken);
             return Ok();
         }
     }
