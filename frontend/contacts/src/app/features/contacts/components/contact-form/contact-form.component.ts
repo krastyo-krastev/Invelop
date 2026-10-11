@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { DestroyRef, Component, computed, inject, signal } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngxs/store';
@@ -13,6 +13,8 @@ import { Contact } from '../../models/contact.model';
 import { CreateContact, LoadContactById, UpdateContact } from '../../state/contact.actions';
 import { SaveContactRequest } from '../../dtos/contacts.dto';
 import { ContactState } from '../../state/contact.state';
+import { finalize } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 type PhoneForm = {
   number: FormControl<string>;
@@ -51,6 +53,7 @@ export class ContactFormComponent {
   private readonly store = inject(Store);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
 
   readonly contactId = signal<number | null>(null);
   readonly isEditMode = computed(() => this.contactId() !== null);
@@ -123,6 +126,14 @@ export class ContactFormComponent {
     } else {
       this.addPhone();
     }
+
+    this.form.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        if (this.loadError() !== null) {
+          this.loadError.set(null);
+        }
+      });    
   }
   
   private createPhoneGroup(
@@ -200,6 +211,7 @@ export class ContactFormComponent {
         : null,
       country: value.country.trim(),
       city: value.city.trim(),
+      postalCode: value.postalCode.trim(),
       street: value.street.trim(),
       iban: value.iban.trim(),
       phoneNumbers: value.phoneNumbers.map(phone => ({
@@ -213,11 +225,19 @@ export class ContactFormComponent {
       ? new UpdateContact(request)
       : new CreateContact(request);
 
-    this.store.dispatch(action).subscribe({
-      next: () => this.router.navigate(['/contacts']),
-      error: () => this.loadError.set('Failed to save contact.'),
-      complete: () => this.saving.set(false)
-    });
+    this.store.dispatch(action)
+      .pipe(finalize(() => this.saving.set(false)))
+      .subscribe({
+        next: (data: unknown) => {
+          const stateError = this.store.selectSnapshot(ContactState.error);
+          if (stateError) {
+            this.loadError.set(stateError);
+          } else {
+            this.router.navigate(['/contacts'])
+          }
+        },
+        error: () => this.loadError.set('Failed to save contact.')
+      });
   }
 
   cancel(): void {

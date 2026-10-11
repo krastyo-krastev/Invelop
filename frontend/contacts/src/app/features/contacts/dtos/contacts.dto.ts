@@ -27,6 +27,7 @@ export interface SaveContactRequest {
     dateOfBirth: string | null;
     country: string;
     city: string;
+    postalCode: string;
     street: string;
     iban: string;
     phoneNumbers: PhoneNumber[];

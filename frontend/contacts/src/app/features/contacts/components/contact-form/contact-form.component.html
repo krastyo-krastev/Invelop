@@ -4,9 +4,11 @@
     <h2>{{ isEditMode() ? 'Edit Contact' : 'Create Contact' }}</h2>
   </div>
 
-  @if (loadError()) {
-    <p-message severity="error" [text]="loadError()!" />
-  }
+  @if (loadError(); as error) {
+    <p-message severity="error">
+        {{ error }}
+    </p-message>
+    }
 
   <section class="form-section">
     <h3>Personal Information</h3>
@@ -153,7 +155,7 @@
               optionLabel="label"
               optionValue="value"
               placeholder="Select type"
-              styleClass="w-full"
+              class="w-full"
             />
           </div>
 

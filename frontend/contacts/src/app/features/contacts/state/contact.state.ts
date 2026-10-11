@@ -4,7 +4,7 @@ import { EMPTY, tap, catchError } from 'rxjs';
 
 import { ContactService } from '../services/contact.service';
 import { Contact, ContactSummary } from '../models/contact.model';
-import { LoadContactById, LoadContacts } from './contact.actions'
+import { CreateContact, LoadContactById, LoadContacts, UpdateContact } from './contact.actions'
 import { HttpErrorResponse } from '@angular/common/http';
 import { PaginationDto } from '../dtos/pagination.dto';
 
@@ -28,101 +28,158 @@ export interface ContactStateModel {
 })
 @Injectable()
 export class ContactState {
-    constructor(private contactService: ContactService) { }
+  constructor(private contactService: ContactService) { }
 
-    /* Contacts Selectors */
-    @Selector()
-    static contacts(state: ContactStateModel) {
-        return state.contacts;
-    }
+  /* Contacts Selectors */
+  @Selector()
+  static contacts(state: ContactStateModel) {
+    return state.contacts;
+  }
 
-    @Selector()
-    static loading(state: ContactStateModel) {
-        return state.loading;
-    }
+  @Selector()
+  static loading(state: ContactStateModel) {
+    return state.loading;
+  }
 
-    @Selector()
-    static error(state: ContactStateModel) {
-        return state.error;
-    }
+  @Selector()
+  static error(state: ContactStateModel) {
+    return state.error;
+  }
 
-    @Selector()
-    static pagination(state: ContactStateModel) {
-        return state.pagination;
-    }
+  @Selector()
+  static pagination(state: ContactStateModel) {
+    return state.pagination;
+  }
 
-    @Selector()
-    static selectedContact(state: ContactStateModel) {
-        return state.selectedContact;
-    }
+  @Selector()
+  static selectedContact(state: ContactStateModel) {
+    return state.selectedContact;
+  }
 
-    /* Load paginated list of contacts */
-    @Action(LoadContacts)
-    loadContacts(
-        ctx: StateContext<ContactStateModel>,
-        action: LoadContacts
-    ) {
-        ctx.patchState({ loading: true, error: null });
+  /** Load paginated list of contacts */
+  @Action(LoadContacts)
+  loadContacts(
+    ctx: StateContext<ContactStateModel>,
+    action: LoadContacts
+  ) {
+    ctx.patchState({ loading: true, error: null });
 
-        return this.contactService
-            .getContacts(action.page, action.pageSize)
-            .pipe(
-                tap(response => {
-                    ctx.patchState({
-                        contacts: response.data,
-                        pagination: response.pagination,
-                        loading: false
-                    });
-                }),
-                catchError((error: HttpErrorResponse) => {
-                    ctx.patchState({
-                        loading: false,
-                        error: this.getErrorMessage(error)
-                    });
+    return this.contactService
+      .getContacts(action.page, action.pageSize)
+      .pipe(
+        tap(response => {
+          ctx.patchState({
+            contacts: response.data,
+            pagination: response.pagination,
+            loading: false
+          });
+        }),
+        catchError((error: HttpErrorResponse) => {
+          ctx.patchState({
+            loading: false,
+            error: this.getErrorMessage(error, 'Failed to load contacts.')
+          });
 
-                    return EMPTY;
-                })
-            );
-    }
+          return EMPTY;
+        })
+      );
+  }
 
-    /* Load single contact by id */
-    @Action(LoadContactById)
-    loadContactById(
-        ctx: StateContext<ContactStateModel>,
-        action: LoadContactById
-    ) {
+  /** Load single contact by id */
+  @Action(LoadContactById)
+  loadContactById(
+    ctx: StateContext<ContactStateModel>,
+    action: LoadContactById
+  ) {
+    ctx.patchState({
+      loading: true,
+      error: null
+    });
+
+    return this.contactService.getContactById(action.id).pipe(
+      tap(contact => {
         ctx.patchState({
-            loading: true,
-            error: null
+          selectedContact: contact,
+          loading: false
+        });
+      }),
+      catchError(error => {
+        ctx.patchState({
+          loading: false,
+          error: this.getErrorMessage(error, 'Failed to load contact.')
         });
 
-        return this.contactService.getContactById(action.id).pipe(
-            tap(contact => {
-                ctx.patchState({
-                    selectedContact: contact,
-                    loading: false
-                });
-            }),
-            catchError(error => {
-                ctx.patchState({
-                    loading: false,
-                    error: 'Failed to load contact.'
-                });
+        return EMPTY;
+      })
+    );
+  }
 
-                return EMPTY;
-            })
-        );
+  /** Create new contact action */
+  @Action(CreateContact)
+  createContact(
+    ctx: StateContext<ContactStateModel>,
+    action: CreateContact
+  ) {
+    ctx.patchState({
+      loading: true,
+      error: null
+    });
+
+    return this.contactService.createContact(action.contact).pipe(
+      tap(contact => {
+        ctx.patchState({
+          loading: false
+        });
+      }),
+      catchError(error => {
+        ctx.patchState({
+          loading: false,
+          error: this.getErrorMessage(error, 'Failed to create new contact.')
+        });
+
+        return EMPTY;
+      })
+    );
+  }
+
+  /** Update contact action */
+  @Action(UpdateContact)
+  updateContact(
+    ctx: StateContext<ContactStateModel>,
+    action: UpdateContact
+  ) {
+    ctx.patchState({
+      loading: true,
+      error: null
+    });
+    
+    return this.contactService.updateContact(action.contact).pipe(
+      tap(contact => {
+        ctx.patchState({
+          loading: false
+        });
+      }),
+      catchError(error => {
+        ctx.patchState({
+          loading: false,
+          error: this.getErrorMessage(error, 'Failed to save contact.')
+        });
+
+        return EMPTY;
+      })
+    );    
+  }
+
+  /** Error message helper */
+  private getErrorMessage(error: HttpErrorResponse, defaultMessage: string): string {
+    if (error.status === 0) {
+      return 'Unable to connect to the server.';
     }
 
-    private getErrorMessage(error: HttpErrorResponse): string {
-        if (error.status === 0) {
-            return 'Unable to connect to the server.';
-        }
-
-        if (error.status >= 500) {
-            return 'A server error occurred. Please try again later.';
-        }
-
-        return error.error?.message ?? 'Failed to load contacts.';
+    if (error.status >= 500) {
+      return 'A server error occurred. Please try again later.';
     }
+
+    return error.error?.message ?? defaultMessage;
+  }
 }

@@ -82,6 +82,6 @@ export class ContactListComponent {
   }
 
   addContact(): void {
-    this.router.navigate(['/contacts']);
+    this.router.navigate(['/contacts/new']);
   }
 }
