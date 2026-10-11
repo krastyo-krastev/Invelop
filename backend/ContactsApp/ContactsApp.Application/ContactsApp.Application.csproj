@@ -15,4 +15,8 @@
     <ProjectReference Include="..\ContactsApp.Domain\ContactsApp.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Common\Models\" />
+  </ItemGroup>
+
 </Project>

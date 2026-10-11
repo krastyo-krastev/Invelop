@@ -81,4 +81,11 @@ public class ErrorResponse
         return Create("DOMAIN_ERROR", message, (int)HttpStatusCode.UnprocessableEntity, requestId, details);
     }
 
+    /// <summary>
+    /// Create error response for wrong API arguments
+    /// </summary>
+    public static ErrorResponse ArgumentError(string message, string? requestId = null, Dictionary<string, object>? details = null)
+    {
+        return Create("ARGUMENT_ERROR", message, (int)HttpStatusCode.BadRequest, requestId, details);
+    }
 }
