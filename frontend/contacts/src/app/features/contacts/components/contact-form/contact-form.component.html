@@ -1,7 +1,7 @@
 
 <form [formGroup]="form" (ngSubmit)="save()" class="contact-form">
   <div class="form-header">
-    <h2>{{ isEditMode() ? 'Edit Contact' : 'Create Contact' }}</h2>
+    <h2 data-testid="contacts-form-h2-title">{{ isEditMode() ? 'Edit Contact' : 'Create Contact' }}</h2>
   </div>
 
   @if (loadError(); as error) {
@@ -197,6 +197,7 @@
       severity="secondary"
       [outlined]="true"
       (onClick)="cancel()"
+      data-testid="contacts-form-button-cancel"
     />
 
     <p-button
@@ -205,6 +206,7 @@
       icon="pi pi-check"
       [loading]="saving()"
       [disabled]="saving()"
+      data-testid="contacts-form-button-save"      
     />
   </div>
 </form>
