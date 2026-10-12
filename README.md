@@ -46,3 +46,10 @@ Apply all pending migrations to the database
 ```
 dotnet ef database update --project ./ContactsApp.Infrastructure/ --startup-project ./ContactsApp.API/
 ```
+
+### TODO
+
+- Add delete contact command
+- Extend validation error messages on the contact form page
+- Add unit tests
+- Extend Playwright tests
