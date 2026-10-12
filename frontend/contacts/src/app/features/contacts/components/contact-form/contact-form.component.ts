@@ -15,8 +15,10 @@ import { SaveContactRequest } from '../../dtos/contacts.dto';
 import { ContactState } from '../../state/contact.state';
 import { finalize } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { MessageService } from 'primeng/api';
 
 type PhoneForm = {
+  id: FormControl<number>;
   number: FormControl<string>;
   type: FormControl<PhoneType>;
   isPrimary: FormControl<boolean>;
@@ -25,7 +27,7 @@ type PhoneForm = {
 type ContactForm = {
   firstName: FormControl<string>;
   surname: FormControl<string>;
-  dateOfBirth: FormControl<Date | null>;
+  dateOfBirth: FormControl<string>;
   country: FormControl<string>;
   city: FormControl<string>;
   postalCode: FormControl<string>;
@@ -54,6 +56,7 @@ export class ContactFormComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly messageService = inject(MessageService);
 
   readonly contactId = signal<number | null>(null);
   readonly isEditMode = computed(() => this.contactId() !== null);
@@ -77,7 +80,7 @@ export class ContactFormComponent {
       Validators.required,
       Validators.maxLength(100)
     ]),
-    dateOfBirth: this.fb.control<Date | null>(new Date(), 
+    dateOfBirth: this.fb.control<string>(this.today.toISOString(), 
       Validators.required),
     country: this.fb.nonNullable.control('', [
       Validators.required,
@@ -138,12 +141,14 @@ export class ContactFormComponent {
   
   private createPhoneGroup(
     phone?: Partial<{
+      id: number;
       number: string;
       type: PhoneType;
       isPrimary: boolean;
     }>
   ): FormGroup<PhoneForm> {
     return this.fb.group<PhoneForm>({
+      id: this.fb.nonNullable.control(phone?.id ?? 0), 
       number: this.fb.nonNullable.control(phone?.number ?? '', [
         Validators.required,
         Validators.maxLength(50)
@@ -175,16 +180,17 @@ export class ContactFormComponent {
   }
 
   private populateForm(contact: Contact): void {
-    this.form.patchValue({
+    const patchVal = {
       firstName: contact.firstName,
       surname: contact.surname,
-      dateOfBirth: new Date(contact.dateOfBirth),
+      dateOfBirth: contact.dateOfBirth,
       country: contact.country,
       city: contact.city,
       postalCode: contact.postalCode,
       street: contact.street,
       iban: contact.iban
-    });
+    }
+    this.form.patchValue(patchVal);
 
     this.phoneNumbers.clear();
     contact.phoneNumbers.forEach(phone => {
@@ -206,15 +212,14 @@ export class ContactFormComponent {
       id: this.isEditMode() ? this.contactId()! : 0,
       firstName: value.firstName.trim(),
       surname: value.surname.trim(),
-      dateOfBirth: value.dateOfBirth
-        ? this.toDateOnlyString(value.dateOfBirth)
-        : null,
+      dateOfBirth: value.dateOfBirth,
       country: value.country.trim(),
       city: value.city.trim(),
       postalCode: value.postalCode.trim(),
       street: value.street.trim(),
       iban: value.iban.trim(),
       phoneNumbers: value.phoneNumbers.map(phone => ({
+        id: phone.id,
         number: phone.number.trim(),
         type: phone.type,
         isPrimary: phone.isPrimary
@@ -233,6 +238,8 @@ export class ContactFormComponent {
           if (stateError) {
             this.loadError.set(stateError);
           } else {
+            const msg = this.isEditMode() ? "Contact is successfully updated" : "Contact is successfully created";
+            this.successMessage(msg);
             this.router.navigate(['/contacts'])
           }
         },
@@ -251,4 +258,13 @@ export class ContactFormComponent {
 
     return `${year}-${month}-${day}`;
   }  
+
+  private successMessage(message: string) {
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Success',
+      detail: message,
+      life: 3000
+    });
+  }
 }

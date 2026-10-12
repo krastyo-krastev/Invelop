@@ -32,3 +32,6 @@ export interface SaveContactRequest {
     iban: string;
     phoneNumbers: PhoneNumber[];
 }
+
+export interface ErrorResponse {
+}

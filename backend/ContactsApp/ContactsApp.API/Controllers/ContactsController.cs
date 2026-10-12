@@ -69,9 +69,11 @@ namespace ContactsApp.API.Controllers
                 return BadRequest(errorResponse);
             }
 
+            var date = DateTime.Parse(contact.DateOfBirth);
+
             var command = new CreateContactCommand(contact.FirstName,
                 contact.Surname,
-                DateOnly.Parse(contact.DateOfBirth),
+                new DateOnly(date.Year, date.Month, date.Day),
                 contact.Country,
                 contact.City,
                 contact.PostalCode,
@@ -96,10 +98,12 @@ namespace ContactsApp.API.Controllers
                 return BadRequest(errorResponse);
             }
 
+            var date = DateTime.Parse(contact.DateOfBirth);
+
             var command = new UpdateContactCommand(contact.Id,
                 contact.FirstName,
                 contact.Surname,
-                DateOnly.Parse(contact.DateOfBirth),
+                new DateOnly(date.Year, date.Month, date.Day),
                 contact.Country,
                 contact.City,
                 contact.PostalCode,

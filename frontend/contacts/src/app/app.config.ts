@@ -6,6 +6,7 @@ import Aura from '@primeuix/themes/aura';
 import { provideStore } from '@ngxs/store';
 import { API_BASE_URL } from './core/tokens/api-url.token';
 import { ContactState } from './features/contacts/state/contact.state';
+import { MessageService } from 'primeng/api';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -20,6 +21,7 @@ export const appConfig: ApplicationConfig = {
     {
       provide: API_BASE_URL,
       useValue: 'https://localhost:7266/api'
-    }
+    },
+    MessageService
   ],
 };
